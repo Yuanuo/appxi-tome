@@ -1,6 +1,7 @@
 package org.appxi.tome.cbeta;
 
 import org.appxi.prefs.UserPrefs;
+import org.appxi.util.DevtoolHelper;
 import org.appxi.util.FileHelper;
 
 import java.nio.file.Path;
@@ -36,9 +37,9 @@ public class BookMapEx extends BookMap {
 
         this.data = super.getDataMap();
         this.data.forEach((k, v) -> ChapterTree.getOrInitBookChapters(v));
-        final boolean success = FileHelper.writeObject(cacheFile, this.data);
+        final boolean success = FileHelper.writeObject(this.data, cacheFile);
         if (success)
-            System.out.println("Cached book : " + cacheFile.toAbsolutePath());
+            DevtoolHelper.LOG.info("Cached book : " + cacheFile.toAbsolutePath());
         else throw new RuntimeException("cannot cache book");// for debug only
 
         return this.data;

@@ -2,6 +2,8 @@ package org.appxi.tome.cbeta;
 
 import org.appxi.tome.TomeHelper;
 import org.appxi.tome.model.Book;
+import org.appxi.util.DevtoolHelper;
+import org.appxi.util.StringHelper;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -129,10 +131,37 @@ public abstract class CbetaHelper {
                     book.authors.addAll(Arrays.asList(nameStr.split("[、．]")));
                 } else {
                     // ignore for now
-//                    System.out.println("unknown author: " + nameStr + "  ///  " + author);
+//                    DevtoolHelper.LOG.info("unknown author: " + nameStr + "  ///  " + author);
                 }
             }
         }
+    }
+
+    public static String parseNavCatalogInfo(String text) {
+        if (!text.contains(" ")) {
+            return text;
+        }
+        final String[] groups = text.replace(", ", ",,")
+                .replace("etc.", " ")
+                .replace("  ", " ")
+                .split("／");
+        final StringBuilder result = new StringBuilder();
+        for (String group : groups) {
+            final StringBuilder buf = new StringBuilder();
+            for (String tmp : StringHelper.split(group, " ", "[\\(\\)]")) {
+                if (tmp.matches("^[a-zA-Z=].*"))
+                    continue;
+                if (buf.length() == 0 && tmp.matches("^[0-9].*"))
+                    continue;
+                buf.append(tmp).append(' ');
+            }
+            if (buf.length() > 0) {
+                if (result.length() > 0)
+                    result.append('／');
+                result.append(buf.toString().strip());
+            }
+        }
+        return result.length() == 0 ? text : result.toString();
     }
 
 
@@ -155,7 +184,7 @@ public abstract class CbetaHelper {
         if (null == book || null == visitor || !walkTocs && !walkVols)
             return;
         if (null != book.path && book.path.startsWith("toc/")) {
-//            System.out.println("init chapters: " + book.path);
+//            DevtoolHelper.LOG.info("init chapters: " + book.path);
             final Document doc = TomeHelper.xml(CbetaHelper.resolveData(book.path));
             final Element body = doc.body();
             //

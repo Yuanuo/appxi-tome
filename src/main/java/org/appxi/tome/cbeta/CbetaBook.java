@@ -4,7 +4,6 @@ import org.appxi.tome.model.Book;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class CbetaBook extends Book {
@@ -17,22 +16,11 @@ public class CbetaBook extends Book {
 
     public String tripitakaId, number;
 
-    @Override
-    public Collection<String> getPeriods() {
-        ensureAuthorInfoParsed();
-        return this.periods;
-    }
-
-    @Override
-    public Collection<String> getAuthors() {
-        ensureAuthorInfoParsed();
-        return this.authors;
-    }
-
-    private void ensureAuthorInfoParsed() {
+    public String authorInfo() {
         if (!this.hasAttr(AK_AUTHORS)) {
             CbetaHelper.parseBookAuthorInfo(this);
             this.attr(AK_AUTHORS, true);
         }
+        return this.authorInfo;
     }
 }

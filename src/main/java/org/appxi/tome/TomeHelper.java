@@ -1,8 +1,10 @@
 package org.appxi.tome;
 
 import org.appxi.prefs.UserPrefs;
+import org.appxi.util.DevtoolHelper;
 import org.appxi.util.DigestHelper;
 import org.appxi.util.FileHelper;
+import org.appxi.util.StringHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.parser.Parser;
@@ -113,7 +115,7 @@ public abstract class TomeHelper {
 
     public static boolean saveDocument(Document document, Path targetFile, boolean xmlMode) {
         FileHelper.makeParents(targetFile);
-        System.out.println("\tSave document: " + targetFile);
+        DevtoolHelper.LOG.info(StringHelper.msg("\tSave document: ", targetFile));
         try {
             if (xmlMode)
                 document.outputSettings().prettyPrint(false).syntax(Document.OutputSettings.Syntax.xml);

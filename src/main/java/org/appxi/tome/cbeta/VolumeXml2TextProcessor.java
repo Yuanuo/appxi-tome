@@ -2,6 +2,7 @@ package org.appxi.tome.cbeta;
 
 import org.appxi.tome.xml.FilteredProcessor;
 import org.appxi.tome.xml.LinkedTxtFilter;
+import org.appxi.util.DevtoolHelper;
 import org.appxi.util.NumberHelper;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
@@ -64,7 +65,7 @@ public class VolumeXml2TextProcessor extends FilteredProcessor<String> {
             default:
                 if (!unhandledTags.contains(tagName)) {
                     unhandledTags.add(tagName);
-                    System.out.println("ToText.?> " + tagName);
+                    DevtoolHelper.LOG.info("ToText.?> " + tagName);
                 }
                 break;
         }

@@ -4,6 +4,7 @@ import org.appxi.util.ext.Attributes;
 import org.appxi.util.ext.Node;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -22,7 +23,7 @@ public class Book extends Attributes implements Serializable {
     public String location;
     public String copyright;
     //
-    private Collection<String> extras;
+    public final Collection<String> extras = new ArrayList<>();
     //
     public String path;
 
@@ -41,16 +42,8 @@ public class Book extends Attributes implements Serializable {
         return this;
     }
 
-    public Collection<String> getPeriods() {
-        return periods;
-    }
-
-    public Collection<String> getAuthors() {
-        return authors;
-    }
-
-    public Collection<String> getExtras() {
-        return extras;
+    public String authorInfo() {
+        return this.authorInfo;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.appxi.tome.cbeta;
 
 import org.appxi.prefs.UserPrefs;
+import org.appxi.util.DevtoolHelper;
 import org.appxi.util.FileHelper;
 import org.appxi.util.StringHelper;
 import org.jsoup.nodes.Element;
@@ -29,9 +30,9 @@ public class VolumeDocumentEx extends VolumeDocument {
         final Path cacheFile = UserPrefs.cacheDir().resolve(cachePath);
         if (Files.notExists(cacheFile)) {
             final String stdHtmlDoc = super.toStandardHtmlDocument(elementSupplier, bodyWrapper, includes);
-            final boolean success = FileHelper.writeString(cacheFile, stdHtmlDoc);
+            final boolean success = FileHelper.writeString(stdHtmlDoc, cacheFile);
             if (success)
-                System.out.println("Cached : " + cacheFile.toAbsolutePath());
+                DevtoolHelper.LOG.info("Cached : " + cacheFile.toAbsolutePath());
             else throw new RuntimeException("cannot cache stdHtmlDoc");// for debug only
         }
         return cacheFile.toAbsolutePath().toString();
@@ -43,9 +44,9 @@ public class VolumeDocumentEx extends VolumeDocument {
         final Path cacheFile = UserPrefs.cacheDir().resolve(cachePath);
         if (Files.notExists(cacheFile)) {
             final String stdTextDoc = super.toStandardTextDocument(elementSupplier);
-            final boolean success = FileHelper.writeString(cacheFile, stdTextDoc);
+            final boolean success = FileHelper.writeString(stdTextDoc, cacheFile);
             if (success)
-                System.out.println("Cached : " + cacheFile.toAbsolutePath());
+                DevtoolHelper.LOG.info("Cached : " + cacheFile.toAbsolutePath());
             else throw new RuntimeException("cannot cache stdTextDoc");// for debug only
         }
         return cacheFile.toAbsolutePath().toString();

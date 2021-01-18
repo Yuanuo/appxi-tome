@@ -1,4 +1,5 @@
 module appxi.tome {
+    requires java.logging;
     requires appxi.shared;
     requires org.jsoup;
 

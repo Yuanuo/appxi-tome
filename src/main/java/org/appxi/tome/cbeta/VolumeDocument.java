@@ -2,6 +2,7 @@ package org.appxi.tome.cbeta;
 
 import org.appxi.tome.xml.LinkedTxtFilter;
 import org.appxi.tome.xml.LinkedXmlFilter;
+import org.appxi.util.DevtoolHelper;
 import org.appxi.util.DigestHelper;
 import org.appxi.util.StringHelper;
 import org.jsoup.Jsoup;
@@ -51,7 +52,7 @@ public class VolumeDocument {
             this.document = Jsoup.parse("");
         else
             try (InputStream inStream = new BufferedInputStream(Files.newInputStream(this.volumeXml))) {
-                System.out.println("Jsoup.parseXml: " + this.volumeXml.toAbsolutePath());
+                DevtoolHelper.LOG.info(StringHelper.msg("Jsoup.parseXml: " + this.volumeXml.toAbsolutePath()));
                 this.document = Jsoup.parse(inStream, "UTF-8", "/", Parser.xmlParser());
             } catch (Exception e) {
                 throw new RuntimeException(e);

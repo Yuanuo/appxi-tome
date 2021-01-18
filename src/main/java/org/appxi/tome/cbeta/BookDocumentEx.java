@@ -2,6 +2,7 @@ package org.appxi.tome.cbeta;
 
 import org.appxi.prefs.UserPrefs;
 import org.appxi.tome.model.Chapter;
+import org.appxi.util.DevtoolHelper;
 import org.appxi.util.FileHelper;
 import org.appxi.util.ext.Node;
 
@@ -46,9 +47,9 @@ public class BookDocumentEx extends BookDocument {
         }
 
         this.chapters = super.getChapters();
-        final boolean success = FileHelper.writeObject(cacheFile, this.chapters);
+        final boolean success = FileHelper.writeObject(this.chapters, cacheFile);
         if (success)
-            System.out.println("Cached chapters : " + cacheFile.toAbsolutePath());
+            DevtoolHelper.LOG.info("Cached chapters : " + cacheFile.toAbsolutePath());
         else throw new RuntimeException("cannot cache chapters");// for debug only
 
         return this.chapters;

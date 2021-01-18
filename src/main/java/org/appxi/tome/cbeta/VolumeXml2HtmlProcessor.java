@@ -2,6 +2,7 @@ package org.appxi.tome.cbeta;
 
 import org.appxi.tome.xml.FilteredProcessor;
 import org.appxi.tome.xml.LinkedXmlFilter;
+import org.appxi.util.DevtoolHelper;
 import org.appxi.util.NumberHelper;
 import org.appxi.util.StringHelper;
 import org.jsoup.Jsoup;
@@ -162,7 +163,7 @@ public class VolumeXml2HtmlProcessor extends FilteredProcessor<Element> {
                 newBuff("span", ele).addClass("unhandled");
                 if (!unhandledTags.contains(tag)) {
                     unhandledTags.add(tag);
-                    System.out.println("ToHtml.?> " + tag);
+                    DevtoolHelper.LOG.info("ToHtml.?> " + tag);
                 }
                 break;
         }
