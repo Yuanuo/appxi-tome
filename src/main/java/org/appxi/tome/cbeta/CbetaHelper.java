@@ -2,15 +2,18 @@ package org.appxi.tome.cbeta;
 
 import org.appxi.tome.TomeHelper;
 import org.appxi.tome.model.Book;
-import org.appxi.util.DevtoolHelper;
 import org.appxi.util.StringHelper;
+import org.appxi.util.XmlSaxHelper;
+import org.appxi.util.ext.Node;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.xml.sax.Attributes;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 
 public abstract class CbetaHelper {
@@ -184,7 +187,6 @@ public abstract class CbetaHelper {
         if (null == book || null == visitor || !walkTocs && !walkVols)
             return;
         if (null != book.path && book.path.startsWith("toc/")) {
-//            DevtoolHelper.LOG.info("init chapters: " + book.path);
             final Document doc = TomeHelper.xml(CbetaHelper.resolveData(book.path));
             final Element body = doc.body();
             //
@@ -199,6 +201,57 @@ public abstract class CbetaHelper {
                             return;
                     }
                 }
+            }
+        }
+    }
+
+
+    public static void walkTocChaptersByXmlSAX(CbetaBook book, BiConsumer<String, String> visitor) {
+        walkBookChaptersByXmlSAX(book, true, false, visitor);
+    }
+
+    public static void walkVolChaptersByXmlSAX(CbetaBook book, BiConsumer<String, String> visitor) {
+        walkBookChaptersByXmlSAX(book, false, true, visitor);
+    }
+
+    public static void walkBookChaptersByXmlSAX(CbetaBook book, BiConsumer<String, String> visitor) {
+        walkBookChaptersByXmlSAX(book, true, true, visitor);
+    }
+
+    public static void walkBookChaptersByXmlSAX(CbetaBook book, boolean walkTocs, boolean walkVols, BiConsumer<String, String> visitor) {
+        if (null == book || null == visitor || !walkTocs && !walkVols)
+            return;
+        if (null != book.path && book.path.startsWith("toc/")) {
+            try {
+                XmlSaxHelper.walk(CbetaHelper.resolveData(book.path),
+                        new XmlSaxHelper.XmlSaxVisitor() {
+                            @Override
+                            public boolean accept(Node<String> node, Attributes attributes) {
+                                if ("nav".equals(node.value)) {
+                                    node.attr("type", attributes.getValue("type"));
+                                    return false;
+                                }
+                                if (StringHelper.indexOf(node.value, "cblink", "a")) {
+                                    if (walkTocs && node.findParent(n -> n.hasAttr("type", "catalog")) != null)
+                                        return true;
+                                    return walkVols && node.findParent(n -> n.hasAttr("type", "juan")) != null;
+                                }
+                                return false;
+                            }
+
+                            @Override
+                            public void preVisitElement(Node<String> node, Attributes attributes) {
+                                node.attr("href", attributes.getValue("href"));
+                            }
+
+                            @Override
+                            public void visitElementContent(Node<String> node, String text) {
+                                visitor.accept(node.attr("href"), text);
+                            }
+                        }
+                );
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
         }
     }
