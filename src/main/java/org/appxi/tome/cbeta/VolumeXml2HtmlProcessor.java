@@ -141,10 +141,10 @@ public class VolumeXml2HtmlProcessor extends FilteredProcessor<Element> {
             case "figure":
                 newBuff(tag, ele);
                 break;
-            case "graphic":
-                addBuff("img", ele).attr("src", ele.attr("url"));
+            case "graphic", "img":
+                addBuff("img", ele).attr("src", ele.attr("img".equals(tag) ? "src" : "url"));
                 return FilterResult.SKIP_ENTIRELY;
-            case "table":
+            case "table", "tbody", "tr", "td", "ul", "ol", "li":
                 newBuff(tag, ele);
                 break;
             case "row":
@@ -158,6 +158,12 @@ public class VolumeXml2HtmlProcessor extends FilteredProcessor<Element> {
                 break;
             case "item":
                 newBuff("li", ele);
+                break;
+            case "a":
+                newBuff(tag, ele).attr("href", ele.attr("href"));
+                break;
+            case "br":
+                addBuff(tag, ele);
                 break;
             default:
                 newBuff("span", ele).addClass("unhandled");
