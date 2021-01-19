@@ -36,7 +36,7 @@ public abstract class TomeHelper {
     }
 
     public static Path webCachedFile(String pageUrl) {
-        return UserPrefs.workDir().resolve(".tome-cache").resolve(FileHelper.makeEncodedPath(pageUrl, ".temp"));
+        return UserPrefs.dataDir().resolve(".tome-cache").resolve(FileHelper.makeEncodedPath(pageUrl, ".temp"));
     }
 
     public static InputStream webCachedStream(String pageUrl) throws IOException {
