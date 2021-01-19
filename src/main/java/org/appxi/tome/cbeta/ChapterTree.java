@@ -6,7 +6,7 @@ import org.appxi.util.ext.Node;
 import java.util.Comparator;
 import java.util.function.Supplier;
 
-public class ChapterTree extends ChapterTreeBase<Node<Chapter>> {
+public class ChapterTree extends ChapterTreeParser<Node<Chapter>> {
     private static final Object AK_PARSED = new Object();
 
     public ChapterTree(CbetaBook book) {

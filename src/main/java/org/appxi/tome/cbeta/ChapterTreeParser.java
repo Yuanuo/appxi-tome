@@ -13,12 +13,12 @@ import org.jsoup.select.Elements;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public abstract class ChapterTreeBase<T> {
+public abstract class ChapterTreeParser<T> {
     public final CbetaBook book;
     private final T volChapters, tocChapters;
     private final Object markParsedKey;
 
-    protected ChapterTreeBase(CbetaBook book, T tocChapters, T volChapters, Object markParsedKey) {
+    protected ChapterTreeParser(CbetaBook book, T tocChapters, T volChapters, Object markParsedKey) {
         this.book = book;
         this.volChapters = volChapters;
         this.tocChapters = tocChapters;
@@ -60,7 +60,7 @@ public abstract class ChapterTreeBase<T> {
             ctxVolumes.stream().sorted().forEach(vol -> initVolChapterAndFixSequence(book, volChapters, vol, ctx));
             fixVolChapters();
         } else {
-            book.chapters.add(createChapter().setId(StringHelper.concat(book.id, "-1")).setType("article").setTitle(book.title).setPath(book.path));
+            createTreeItem(tocChapters, createChapter().setId(StringHelper.concat(book.id, "-1")).setType("article").setTitle(book.title).setPath(book.path));
         }
         if (null != markParsedKey)
             book.attr(markParsedKey, true);
