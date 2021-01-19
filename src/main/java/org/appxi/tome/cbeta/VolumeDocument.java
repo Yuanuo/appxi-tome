@@ -5,6 +5,7 @@ import org.appxi.tome.xml.LinkedXmlFilter;
 import org.appxi.util.DevtoolHelper;
 import org.appxi.util.DigestHelper;
 import org.appxi.util.StringHelper;
+import org.appxi.util.ext.HanLang;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -25,7 +26,7 @@ import java.util.function.Supplier;
 public class VolumeDocument {
     public final CbetaBook book;
     public final String volume;
-    public final Path volumeXml;
+    public final Path volumeFile;
 
     private Document document;
     private int simpleIdCounter = 1;
@@ -33,15 +34,23 @@ public class VolumeDocument {
     public VolumeDocument(CbetaBook book, String volume) {
         this.book = book;
         this.volume = volume;
-        this.volumeXml = CbetaHelper.resolveData(volume);
+        this.volumeFile = CbetaHelper.resolveData(volume);
     }
 
     public boolean exists() {
-        return Files.exists(this.volumeXml);
+        return Files.exists(this.volumeFile);
     }
 
     public boolean notExists() {
         return !this.exists();
+    }
+
+    public boolean isXmlVolume() {
+        return volume.endsWith(".xml") && volume.startsWith("XML/");
+    }
+
+    public boolean notXmlVolume() {
+        return !isXmlVolume();
     }
 
     public Document getDocument() {
@@ -51,39 +60,20 @@ public class VolumeDocument {
         if (this.notExists())
             this.document = Jsoup.parse("");
         else
-            try (InputStream inStream = new BufferedInputStream(Files.newInputStream(this.volumeXml))) {
-                DevtoolHelper.LOG.info(StringHelper.msg("Jsoup.parseXml: " + this.volumeXml.toAbsolutePath()));
-                this.document = Jsoup.parse(inStream, "UTF-8", "/", Parser.xmlParser());
+            try (InputStream inStream = new BufferedInputStream(Files.newInputStream(this.volumeFile))) {
+                DevtoolHelper.LOG.info(StringHelper.msg("Jsoup.parseXml: " + this.volumeFile.toAbsolutePath()));
+                this.document = Jsoup.parse(inStream, "UTF-8", "/", isXmlVolume() ? Parser.xmlParser() : Parser.htmlParser());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         //
-        this.document.attr("vol", this.volume).attr("xml", this.volumeXml.toString());
+        this.document.attr("vol", this.volume).attr("xml", this.volumeFile.toString());
         return this.document;
     }
 
     public Element getDocumentBody() {
-        return this.getDocument().body();
-    }
-
-    public Document getPreparedDocument() {
-        final Document doc = this.getDocument();
-        if (doc.hasAttr("prepared"))
-            return doc;
-
-        // do some init
-
-        // fill id fo all div(s)
-//        doc.body().traverse(new VolumeXmlIdGenerator(this.vol).withDiv());
-//        doc.body().select("cb|mulu, cb|juan[fun=open]").forEach(this::ensureId);
-
-        // mark it already prepared
-        doc.attr("prepared", true);
-        return doc;
-    }
-
-    public Element getPreparedDocumentBody() {
-        return this.getPreparedDocument().body();
+        Document document = this.getDocument();
+        return isXmlVolume() ? document.selectFirst("> TEI > text > body") : document.body();
     }
 
     public String ensureId(Element element) {
@@ -120,6 +110,8 @@ public class VolumeDocument {
         Element propEle = declareChar.selectFirst("> charProp > localName:contains(normalized form)");
         if (null == propEle)
             propEle = declareChar.selectFirst("> charProp > localName:contains(composition)");
+        if (null == propEle)
+            propEle = declareChar.selectFirst("> charProp > localName:contains(Character in the Siddham font)");
         if (null == propEle) {
             // FIXME
             return declareChar.selectFirst("charName").text();
@@ -133,25 +125,21 @@ public class VolumeDocument {
         return processor.toString();
     }
 
-//    protected Element getStandardHtmlElement(Element element) {
-//        final VolumeXml2HtmlProcessor processor = new VolumeXml2HtmlProcessor(this);
-//        NodeTraversor.filter(processor, element);
-//        return processor.toElement();
-//    }
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void filterStandardText(LinkedTxtFilter linkedFilter) {
         final VolumeXml2TextProcessor processor = new VolumeXml2TextProcessor(this, linkedFilter);
-        NodeTraversor.filter(processor, getPreparedDocumentBody());
+        NodeTraversor.filter(processor, getDocumentBody());
     }
 
     public void filterStandardHtml(LinkedXmlFilter linkedFilter) {
         final VolumeXml2HtmlProcessor processor = new VolumeXml2HtmlProcessor(this, linkedFilter);
-        NodeTraversor.filter(processor, getPreparedDocumentBody());
+        NodeTraversor.filter(processor, getDocumentBody());
     }
 
     public String getStandardText() {
+        if (this.notXmlVolume())
+            return this.getDocumentBody().text();
         return getStandardText((String) null, null);
     }
 
@@ -163,12 +151,14 @@ public class VolumeDocument {
     public String getStandardText(Predicate<Element> startFilter, Predicate<Element> stopFilter) {
         final VolumeXml2TextProcessor processor = new VolumeXml2TextProcessor(this,
                 new LinkedTxtFilter(startFilter, stopFilter, null));
-        NodeTraversor.filter(processor, getPreparedDocumentBody());
+        NodeTraversor.filter(processor, getDocumentBody());
         return processor.toString();
     }
 
 
     public Element getStandardHtml() {
+        if (this.notXmlVolume())
+            return this.getDocument();
         return getStandardHtml((Predicate<Element>) null, null);
     }
 
@@ -180,14 +170,14 @@ public class VolumeDocument {
     public Element getStandardHtml(Predicate<Element> startFilter, Predicate<Element> stopFilter) {
         final VolumeXml2HtmlProcessor processor = new VolumeXml2HtmlProcessor(this,
                 new LinkedXmlFilter(startFilter, stopFilter, null));
-        NodeTraversor.filter(processor, getPreparedDocumentBody());
+        NodeTraversor.filter(processor, getDocumentBody());
         return processor.toElement();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public String toStandardHtmlDocument(Supplier<Element> elementSupplier, Function<Element, Object> bodyWrapper, String... includes) {
+    public String toStandardHtmlDocument(HanLang hanLang, Supplier<Element> bodySupplier, Function<Element, Object> bodyWrapper, String... includes) {
         final StringBuilder buf = new StringBuilder();
-        buf.append("<!DOCTYPE html><html lang=\"zh\"><head><meta charset=\"UTF-8\">");
+        buf.append("<!DOCTYPE html><html lang=\"").append(hanLang.lang).append("\"><head><meta charset=\"UTF-8\">");
         //
         final List<String> scripts = new ArrayList<>(), styles = new ArrayList<>();
         for (String include : includes) {
@@ -212,7 +202,7 @@ public class VolumeDocument {
         }
         //
         buf.append("</head>");
-        final Element body = null != elementSupplier ? elementSupplier.get() : this.getStandardHtml();
+        final Element body = null != bodySupplier ? bodySupplier.get() : (isXmlVolume() ? this.getStandardHtml() : getDocumentBody());
         if (null == bodyWrapper) {
             buf.append(body.outerHtml());
         } else {
@@ -234,39 +224,4 @@ public class VolumeDocument {
         Element element = null != elementSupplier ? elementSupplier.get() : null;
         return null != element ? element.text() : this.getStandardText();
     }
-
-//    private List<Chapter> chaptersList;
-//
-//    public List<Chapter> getChaptersList() {
-//        if (null != this.chaptersList)
-//            return this.chaptersList;
-//        this.chaptersList = new ArrayList<>();
-//
-//        this.getPreparedDocument().body().select("cb|mulu, cb|juan").forEach(ele -> {
-//            final Chapter chapter = new Chapter(this.chapter);
-//            chaptersList.add(chapter);
-//
-//            chapter.id = ele.id();
-//            chapter.name = this.getStandardText(ele);
-//
-//            switch (ele.tagName()) {
-//                case "cb:mulu": {
-//                    chapter.type = ele.attr("type");
-//                    String level = ele.attr("level");
-//                    if (level.isBlank())
-//                        level = ele.attrOr("n", "1");
-//                    chapter.level = NumberHelper.toInt(level, 1);
-//                    break;
-//                }
-//                case "cb:juan": {
-//                    chapter.type = ele.attr("fun");
-//                    chapter.level = NumberHelper.toInt(ele.attr("n"), 1);
-//                    break;
-//                }
-//                default:
-//                    break;
-//            }
-//        });
-//        return chaptersList;
-//    }
 }

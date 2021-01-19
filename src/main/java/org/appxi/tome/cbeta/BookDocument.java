@@ -3,6 +3,7 @@ package org.appxi.tome.cbeta;
 import org.appxi.tome.model.Chapter;
 import org.appxi.tome.xml.LinkedTxtFilter;
 import org.appxi.tome.xml.LinkedXmlFilter;
+import org.appxi.util.ext.HanLang;
 import org.appxi.util.ext.Node;
 import org.jsoup.nodes.Element;
 
@@ -38,9 +39,9 @@ public class BookDocument {
         return new VolumeDocument(book, volume);
     }
 
-    public String getVolumeHtmlDocument(String volume, Function<Element, Object> bodyWrapper, String... includes) {
+    public String getVolumeHtmlDocument(String volume, HanLang hanLang, Function<Element, Object> bodyWrapper, String... includes) {
         final VolumeDocument volDocument = getVolumeDocument(volume);
-        return volDocument.toStandardHtmlDocument(null, bodyWrapper, includes);
+        return volDocument.toStandardHtmlDocument(hanLang, null, bodyWrapper, includes);
     }
 
     public String getVolumeTextDocument(String volume) {
@@ -57,22 +58,4 @@ public class BookDocument {
         final VolumeDocument volDocument = getVolumeDocument(volume);
         volDocument.filterStandardHtml(linkedFilter);
     }
-
-//    public String getChapterHtmlDocument(String volume, String startSelector, String stopSelector, Function<Element, Object> bodyWrapper, String... includes) {
-//        final VolumeDocument volDocument = getVolumeDocument(volume);
-//        return volDocument.toStandardHtmlDocument(() -> volDocument.getStandardHtml(startSelector, stopSelector), bodyWrapper, includes);
-//    }
-//
-//    public String getChapterTextDocument(String volume, String startSelector, String stopSelector) {
-//        final VolumeDocument volDocument = getVolumeDocument(volume);
-//        return volDocument.toStandardTextDocument(() -> volDocument.getStandardHtml(startSelector, stopSelector));
-//    }
-
-//    public LinkedHashSet<Chapter> getChaptersList() {
-//        if (null != this.chaptersList)
-//            return this.chaptersList;
-//        this.chaptersList = new LinkedHashSet<>();
-//        book.getVols().forEach(chapter -> this.chaptersList.addAll(getVolDocument(chapter).getChaptersList()));
-//        return this.chaptersList;
-//    }
 }
