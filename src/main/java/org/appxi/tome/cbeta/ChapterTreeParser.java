@@ -35,8 +35,9 @@ public abstract class ChapterTreeParser<T> {
         return tocChapters;
     }
 
+    private boolean onceParsed = false;
     private void ensureBookChaptersParsed() {
-        if (null != markParsedKey && book.hasAttr(markParsedKey))
+        if (onceParsed || null != markParsedKey && book.hasAttr(markParsedKey))
             return;
         if (StringHelper.isBlank(book.path)) {
             // do nothing
@@ -62,6 +63,7 @@ public abstract class ChapterTreeParser<T> {
         } else {
             createTreeItem(tocChapters, createChapter().setId(StringHelper.concat(book.id, "-1")).setType("article").setTitle(book.title).setPath(book.path));
         }
+        onceParsed = true;
         if (null != markParsedKey)
             book.attr(markParsedKey, true);
     }
