@@ -23,4 +23,19 @@ public class CbetaBook extends Book {
         }
         return this.authorInfo;
     }
+
+    public CbetaBook clone() {
+        CbetaBook book = new CbetaBook();
+        this.copyTo(book);
+        return book;
+    }
+
+    protected void copyTo(Book book) {
+        super.copyTo(book);
+        if (book instanceof CbetaBook bookEx) {
+            bookEx.tripitakaId = this.tripitakaId;
+            bookEx.number = this.number;
+            bookEx.serialVols.addAll(this.serialVols);
+        }
+    }
 }

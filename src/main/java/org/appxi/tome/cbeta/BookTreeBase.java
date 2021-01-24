@@ -20,6 +20,17 @@ public abstract class BookTreeBase<T> extends BookTreeParser<T> {
         } else if (link.startsWith("XML/")) {
             final String[] tmpArr = text.split("[ 　]", 2);
             book = books.getDataMap().get(tmpArr[0]);
+            if (null == book && tmpArr[0].matches(".*[a-z]$")) {
+                book = books.getDataMap().get(tmpArr[0].substring(0, tmpArr[0].length() - 1));
+                if (null != book) {
+                    book.attr("cloned", true);
+                    book = book.clone();
+                    book.id = tmpArr[0];
+                    book.title = text;
+                    book.attr("start", link);
+                    books.getDataMap().put(book.id, book);
+                }
+            }
         } else {
             book = new CbetaBook();
             book.id = DigestHelper.crc32c(link);

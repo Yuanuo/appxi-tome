@@ -50,4 +50,15 @@ public class Book extends Attributes implements Serializable {
     public String toString() {
         return this.title;
     }
+
+    protected void copyTo(Book book) {
+        book.id = this.id;
+        book.title = this.title;
+        book.summary = this.summary;
+        book.authorInfo = this.authorInfo;
+        book.catalog = this.catalog;
+        book.location = this.location;
+        book.copyright = copyright;
+        book.path = this.path;
+    }
 }
