@@ -10,15 +10,14 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
+        <maven.compiler.release>16</maven.compiler.release>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.appxi</groupId>
             <artifactId>appxi-shared</artifactId>
-            <version>21.01.00</version>
+            <version>21.01.24</version>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
