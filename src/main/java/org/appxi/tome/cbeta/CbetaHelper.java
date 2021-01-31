@@ -2,6 +2,7 @@ package org.appxi.tome.cbeta;
 
 import org.appxi.tome.TomeHelper;
 import org.appxi.tome.model.Book;
+import org.appxi.util.FileHelper;
 import org.appxi.util.StringHelper;
 import org.appxi.util.XmlSaxHelper;
 import org.appxi.util.ext.Node;
@@ -12,16 +13,22 @@ import org.xml.sax.Attributes;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 
 public abstract class CbetaHelper {
-
+    private static long dataTimeNewest = -1;
     private static Path DIR_DATA = Path.of("");
 
     public static Path dataDir() {
         return DIR_DATA;
+    }
+
+    public static long getDataTimeNewest() {
+        return dataTimeNewest;
     }
 
     public static String getDataDirectory() {
@@ -56,6 +63,7 @@ public abstract class CbetaHelper {
 
         final String[] stdFiles = new String[]{"advance_nav.xhtml", "bookdata.txt", "bulei_nav.xhtml", "catalog.txt",
                 "menu_nav.xhtml", "simple_nav.xhtml", "spine.txt"};
+        final List<Path> stdFilesList = new ArrayList<>();
         for (String stdFile : stdFiles) {
             final Path file = dir.resolve(stdFile);
             if (Files.notExists(file))
@@ -70,7 +78,9 @@ public abstract class CbetaHelper {
             } catch (IOException e) {
                 return null;
             }
+            stdFilesList.add(file);
         }
+        dataTimeNewest = FileHelper.fileTimeNewest(stdFilesList.toArray(new Path[0]));
         return dir;
     }
 
