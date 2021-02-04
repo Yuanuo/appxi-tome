@@ -54,16 +54,19 @@ public class VolumeXml2HtmlProcessor extends FilteredProcessor<Element> {
             case "cb:div":
                 newBuff("div", ele).addClass(ele.attr("type"));
                 break;
-            case "entry", "form", "cb:def", "lg", "l":
+            case "entry", "form", "cb:def", "cb:docnumber":
                 newBuff("div", ele);
+                break;
+            case "lg":
+                newBuff("p", ele);
+                break;
+            case "l":
+                newBuff("span", ele);
                 break;
             case "milestone":
                 addBuff("span", ele)
                         .attr("id", StringHelper.concat(ele.attr("unit"), '-', ele.attr("n")));
                 return FilterResult.SKIP_ENTIRELY;
-            case "cb:docnumber":
-                newBuff("div", ele);
-                break;
             case "byline":
                 newBuff("div", ele).addClass(ele.attr("cb:type"));
                 break;
@@ -85,8 +88,7 @@ public class VolumeXml2HtmlProcessor extends FilteredProcessor<Element> {
                 newBuff("span", ele);
                 break;
             case "lb", "pb":
-                addBuff("span", ele).attr("id", StringHelper.concat('p', ele.attr("n")))
-                        .appendElement("br");
+                addBuff("span", ele).attr("id", StringHelper.concat('p', ele.attr("n")));
                 return FilterResult.SKIP_ENTIRELY;
             case "g":
                 addBuff("span", ele).text(volDocument.getDeclarationText(ele.attr("ref")));
