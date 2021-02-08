@@ -116,13 +116,13 @@ public abstract class ChapterTreeParser<T> {
         return new Chapter();
     }
 
-    private Chapter createChapter(String type, String id, String title, String path, Object start) {
+    private Chapter createChapter(String type, String id, String title, String path, String start) {
         Chapter chapter = createChapter();
         chapter.type = type;
         chapter.id = id;
         chapter.title = title;
         chapter.path = path;
-        chapter.start = start;
+        chapter.start = null != start ? "#".concat(start) : null;
         return chapter;
     }
 
