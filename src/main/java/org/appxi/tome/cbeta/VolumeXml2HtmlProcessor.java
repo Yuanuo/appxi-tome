@@ -38,7 +38,7 @@ public class VolumeXml2HtmlProcessor extends FilteredProcessor<Element> {
         final String str = txt.text().strip();
         if (buff.hasAttr("nobody")) {
             buff.attr("data-t", buff.hasAttr("data-t")
-                    ? StringHelper.concat(buff.attr("data-t"), ",", str)
+                    ? buff.attr("data-t").concat(",").concat(str)
                     : str);
         } else buff.appendText(str);
         return FilterResult.CONTINUE;
@@ -91,7 +91,10 @@ public class VolumeXml2HtmlProcessor extends FilteredProcessor<Element> {
                 addBuff("span", ele).attr("id", StringHelper.concat('p', ele.attr("n")));
                 return FilterResult.SKIP_ENTIRELY;
             case "g":
-                addBuff("span", ele).text(volDocument.getDeclarationText(ele.attr("ref")));
+                String gTxt = volDocument.getDeclarationText(ele.attr("ref"));
+                if (buff.hasAttr("nobody"))
+                    buff.attr("data-t", buff.attr("data-t").concat(gTxt));
+                else addBuff("span", ele).text(gTxt);
                 return FilterResult.SKIP_ENTIRELY;
             case "note":
                 if (ele.attrIs("place", "inline")) {
@@ -104,23 +107,26 @@ public class VolumeXml2HtmlProcessor extends FilteredProcessor<Element> {
                 if (ele.hasAttr("type")) {
                     addBuff("span", ele).addClass(ele.attr("type"))
                             .attr("data-n", ele.attr("n"))
-                            .attr("data-t", ele.text());
+                            .attr("data-t", volDocument.getElementText(ele));
                     return FilterResult.SKIP_ENTIRELY;
                 }
 
                 break;
-            case "app", "term":
+            case "app":
+                newBuff("span", ele).attr("data-n", ele.attr("n"));
+                break;
+            case "term":
                 newBuff("span", ele);
                 break;
             case "lem":
                 newBuff("span", ele).attr("wit", ele.attr("wit"));
                 break;
             case "rdg":
-                newBuff("span", ele)
+                addBuff("span", ele)
                         .attr("wit", ele.attr("wit"))
                         .attr("resp", ele.attr("resp"))
-                        .attr("nobody", true);
-                break;
+                        .attr("data-t", volDocument.getElementText(ele));
+                return FilterResult.SKIP_ENTIRELY;
             case "cb:tt":
                 if (ele.attrIs("type", "app")) {
                     newBuff("span", ele).addClass("app");
@@ -135,7 +141,7 @@ public class VolumeXml2HtmlProcessor extends FilteredProcessor<Element> {
                 break;
             case "space":
                 if (ele.hasAttr("quantity"))
-                    buff.appendText("&nbsp;".repeat(NumberHelper.toInt(ele.attr("quantity"), 0)));
+                    this.buff.appendText("&nbsp;".repeat(NumberHelper.toInt(ele.attr("quantity"), 0)));
                 return FilterResult.SKIP_ENTIRELY;
             case "unclear", "caesura":
                 addBuff("span", ele);
@@ -167,6 +173,9 @@ public class VolumeXml2HtmlProcessor extends FilteredProcessor<Element> {
             case "br":
                 addBuff(tag, ele);
                 break;
+            case "anchor":
+                addBuff("span", ele).addClass(ele.attr("type"));
+                return FilterResult.SKIP_ENTIRELY;
             default:
                 newBuff("span", ele).addClass("unhandled");
                 if (!unhandledTags.contains(tag)) {

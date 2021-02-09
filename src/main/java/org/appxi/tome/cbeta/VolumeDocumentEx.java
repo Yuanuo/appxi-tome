@@ -14,7 +14,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class VolumeDocumentEx extends VolumeDocument {
-    private static final String VERSION = "21.02.01";
+    private static final String VERSION = "21.02.09.1";
 
     public VolumeDocumentEx(CbetaBook book, String volume) {
         super(book, volume);
