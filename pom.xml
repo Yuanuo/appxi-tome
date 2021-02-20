@@ -6,7 +6,7 @@
 
     <groupId>org.appxi</groupId>
     <artifactId>appxi-tome</artifactId>
-    <version>21.02.08</version>
+    <version>21.02.19</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>org.appxi</groupId>
             <artifactId>appxi-shared</artifactId>
-            <version>21.02.08</version>
+            <version>[1.0.0,)</version>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
@@ -28,6 +28,7 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
             </plugin>
