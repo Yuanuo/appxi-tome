@@ -42,7 +42,11 @@ public abstract class CbetaHelper {
 
         Path dataDir = validDataDirectory(homeDir);
         if (null == dataDir)
+            dataDir = validDataDirectory(homeDir.resolve("CBETA"));
+        if (null == dataDir)
             dataDir = validDataDirectory(homeDir.resolve("Bookcase/CBETA"));
+        if (null == dataDir)
+            dataDir = validDataDirectory(homeDir.resolve("cbeta/Bookcase/CBETA"));
         if (null == dataDir)
             return false;
         DIR_DATA = dataDir;
