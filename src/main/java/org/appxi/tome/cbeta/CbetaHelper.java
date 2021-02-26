@@ -92,10 +92,10 @@ public abstract class CbetaHelper {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    private static final String REGEX_AUTHOR_R2 = "(並序|主編|會編|彙輯|刪定|刪合|校定|重刻|重編|編錄|記錄|整理|御製|合校|校訂|增修|脩定|編訂|續修|摘要|定本|" +
-            "校勘|校釋|校注|校註|編次|編註|編纂|編集|手錄|撰述|重訂|重校|續集|纂集|纂補|纂輯|譯纂|釋論|原詩|譯經|編目|編閱|請啟|編緝|御選|纂閱|錄存|錄出|證義|解義|演義|造本論|" +
-            "造頌|譯釋|譯講|科攝|譯述|譯漢|口譯|筆錄|述疏|繪圖|集證|重修|編修|註釋|提唱|譯英|集註|科註|詮註|改寫|詮次|參閱|並註|略註|補註|纂註|評註|宗通|造論|譯抄之)$";
-    private static final String REGEX_AUTHOR_R1 = "([造譯釋記說傳講述撰解編錄集制輯著纂疏補序注問答和跋鈔定詩評頌製註本糅作])$";
+    private static final String REGEX_AUTHOR_R2 = "(並序|主編|會編|彙輯|刪定|刪合|校定|重刻|重編|編錄|記錄|整理|御製|合校|校訂|增修|脩定|編訂|續修|摘要|定本|追擬|譯註|撰輯|排定|" +
+            "校勘|校釋|校注|校註|編次|編註|編纂|編集|手錄|撰述|重訂|重校|續集|纂集|纂補|纂輯|譯纂|釋論|原詩|譯經|編目|編閱|請啟|編緝|御選|纂閱|錄存|錄出|證義|解義|演義|造本論|標註|口述|" +
+            "造頌|譯釋|譯講|科攝|譯述|譯漢|口譯|筆錄|述疏|繪圖|集證|重修|編修|註釋|提唱|譯英|集註|科註|詮註|改寫|詮次|參閱|並註|略註|補註|纂註|評註|宗通|造論|譯抄之|等編訂|等編|重輯并)$";
+    private static final String REGEX_AUTHOR_R1 = "([造譯釋記說傳講述撰解編錄集制輯著纂疏補序注問答和跋鈔定詩評頌製註本糅作較校抄])$";
 
     private static final String REGEX_AUTHOR_M2 = ".*" + REGEX_AUTHOR_R2;
     private static final String REGEX_AUTHOR_M1 = ".*" + REGEX_AUTHOR_R1;
@@ -117,7 +117,7 @@ public abstract class CbetaHelper {
             if (tmpArr.length == 2) {
                 if (tmpArr[0].contains("．")) {
                     nameStr = str;
-                } else {
+                } else if (!StringHelper.indexOf(tmpArr[0], "德溥","守詮","嗣端")) {
                     if (tmpArr[0].length() < 3) {
                         book.periods.add(tmpArr[0]);
                         nameStr = tmpArr[1];
