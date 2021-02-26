@@ -6,7 +6,7 @@
 
     <groupId>org.appxi</groupId>
     <artifactId>appxi-tome</artifactId>
-    <version>21.02.23</version>
+    <version>21.02.26</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
