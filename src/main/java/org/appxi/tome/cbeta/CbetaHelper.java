@@ -118,7 +118,7 @@ public abstract class CbetaHelper {
                 if (tmpArr[0].contains("．")) {
                     nameStr = str;
                 } else if (!StringHelper.indexOf(tmpArr[0], "德溥","守詮","嗣端")) {
-                    if (tmpArr[0].length() < 3) {
+                    if (tmpArr[0].length() < 3 || StringHelper.indexOf(tmpArr[0], "乞伏秦", "南北朝", "宇文周")) {
                         book.periods.add(tmpArr[0]);
                         nameStr = tmpArr[1];
                     }
