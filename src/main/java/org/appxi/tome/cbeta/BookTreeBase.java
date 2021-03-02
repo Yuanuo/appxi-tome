@@ -25,10 +25,8 @@ public abstract class BookTreeBase<T> extends BookTreeParser<T> {
                 if (null != book) {
                     book.attr("cloned", true);
                     book = book.clone();
-                    book.id = tmpArr[0];
                     book.title = text;
                     book.attr("start", link);
-                    books.getDataMap().put(book.id, book);
                 }
             }
         } else {
