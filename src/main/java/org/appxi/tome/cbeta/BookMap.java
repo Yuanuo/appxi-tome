@@ -12,6 +12,7 @@ public class BookMap {
     private static final Pattern VOL_REGEX = Pattern.compile("(.*)(\\(第)(\\d+)(卷-第)(\\d+)(卷.*)");
     public final TripitakaMap tripitakaMap;
     private Map<String, CbetaBook> data;
+    private final Object dataInit = new Object();
 
     public BookMap() {
         this(new TripitakaMap());
@@ -28,13 +29,17 @@ public class BookMap {
     public Map<String, CbetaBook> getDataMap() {
         if (null != this.data)
             return this.data;
-        this.data = new HashMap<>(5120);
-        try {
-            Files.lines(CbetaHelper.resolveData("catalog.txt")).forEach(this::parseBook);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            System.gc();
+        synchronized (dataInit) {
+            if (null != this.data)
+                return this.data;
+            this.data = new HashMap<>(5120);
+            try {
+                Files.lines(CbetaHelper.resolveData("catalog.txt")).forEach(this::parseBook);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                System.gc();
+            }
         }
         return this.data;
     }
