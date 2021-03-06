@@ -36,6 +36,7 @@ public abstract class ChapterTreeParser<T> {
     }
 
     private boolean onceParsed = false;
+
     private void ensureBookChaptersParsed() {
         if (onceParsed || null != markParsedKey && book.hasAttr(markParsedKey))
             return;
@@ -142,7 +143,7 @@ public abstract class ChapterTreeParser<T> {
             ctxVolumes.add(linkInfo[0]);
 
             childVal = createChapter("article",
-                    StringHelper.concat(book.id, "-", DigestHelper.crc32c(linkHref, linkText)),
+                    book.id.concat("_").concat(DigestHelper.crc32c(linkHref, linkText)),
                     linkText,
                     linkInfo[0],
                     linkInfo.length == 2 ? linkInfo[1] : null);
